@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        ul{
+
+            list-style: none;
+        }
+        #basket-tittle{
+            border-top: 1px solid;
+            padding-top: 20px;
+
+        }
+    </style>
+    
+</head>
+<body>
+    <h1>Shopping List</h1>
+    <form>
+        <input type="text" id="item" placeholder="item e.g tomato" required> x 
+        <input type="number" id="quantity" required>
+        <button onclick="addItem(event)">add to list</button>
+    </form> 
+    <p id="shopping-list-display">
+
+    </p>
+    <!-- Shopping basket html -->
+    <h1 id="basket-tittle">Shopping Basket</h1>
+    <p>Enter all the products you've put into your shopping basket separated by commas, to see if you've forgotten anything</p>
+    <form>
+        <input type="text" id="shopping-basket" placeholder="e.g tomato, eggs,milk.." required>
+        <button onclick="addToBasket(event)">Add item(s) to basket</button>
+    </form>
+    <p id="items-still-to-buy-display"></p>
+    <script>
+        
+        const itemInputEl = document.getElementById('item');
+        const quantityInputEl = document.getElementById('quantity');
+        const shoppingListDisplayEl = document.getElementById('shopping-list-display');
+        const shoppingBasketEl = document.getElementById('shopping-basket');
+        const itemsStillToBuyEl = document.getElementById('items-still-to-buy-display');
+        const shoppingList=[];
+
+        function addItem(event){
+            event.preventDefault();
+            const itemToAdd = {
+                            item:itemInputEl.value, 
+                            quantity:quantityInputEl.value
+                            };
+            shoppingList.push(itemToAdd);
+            displayListItems();                
+        }
+
+        function displayListItems(){
+            let html= '<ul>';
+            shoppingList.forEach(element=>{
+                //console.log(element.item.length)
+                if(element.item.length>0 && element.quantity>0){
+                    html+=`<li>${element.item} x ${element.quantity} <span onclick="deleteItem(${shoppingList.indexOf(element)})">&#10062</span></li>`;
+                }    
+            });
+
+            html+='</ul>';
+            shoppingListDisplayEl.innerHTML=html;
+            itemInputEl.value='';
+            quantityInputEl.value='';
+        }
+        function deleteItem(id){
+            shoppingList.splice(id,1);
+            displayListItems();
+        }
+
+        /* add to basket logic */
+
+        //add to basket function
+        function addToBasket(event){
+            event.preventDefault();
+            // split() splits the inputted form data by commas, and returns a new array
+            const basket = shoppingBasketEl.value.toLowerCase().split(',');
+            
+            const itemsStilltobuy = shoppingList.filter(function(itemEl){
+                //console.log(itemEl.item);
+                // condition: check to see if the basket array includes the sopping list item (of the current looping element)
+                // if the element does exist in the basket array, that mjust mean we already have in it our basket so do NOT return
+                // true and do not add the current element to the filtered array (because of the NOT operator)
+                
+                return !basket.includes(itemEl.item.toLowerCase());
+            });
+            //console.log(itemsStilltobuy)
+
+            if(itemsStilltobuy.length===0){
+                itemsStillToBuyEl.innerHTML = '----- YOU GOT EVERYTHING -------';
+            }else{
+                itemsStillToBuyEl.innerHTML = 'Here are items you nee to get:<br/>';
+                
+                itemsStilltobuy.forEach(function(itemEl){
+
+                    itemsStillToBuyEl.innerHTML += `${itemEl.item} x ${itemEl.quantity} <br/>`;
+
+                });
+            }
+            
+           
+        }
+       
+    </script>   
+</body>
+</html>
